@@ -1,0 +1,37 @@
+#summary Instructions for installing and running FITS.
+
+= Install FITS Code =
+From this Downloads section of this website, download the file named fits-(version).zip, for example fits-0.2.5.zip. *The FITS source is included in this ZIP file.*
+
+Create a new directory on your computer and unzip the contents of the FITS ZIP file to the directory.
+
+= Running FITS =
+
+The way you run FITS will depend on your operating system.
+
+== Windows ==
+These instructions describe how to run FITS in a Terminal window. There are other ways you could run FITS on Windows, including from the Windows Explorer, and using the Java API.
+
+  # Open up a command line interface.
+    * Click on Start -> Click on Run -> Type in cmd
+  # Navigate to the directory where you installed FITS, for example:
+    * cd "Program Files"\fits\fits-0.2.5
+  # Run the script names fits.bat
+    * >fits.bat
+  # You should see the FITS usage print out
+  # Run FITS against a file using the -i parameter, for example:
+    * >fits.bat -i "..\..\..\Documents and Settings\agoethals\Desktop\9198541.arc.gz"
+  # You should see the FITS XML output to your terminal screen.
+  # Save FITS XML output to a file using the -o parameter, for example:
+    * >fits.bat -i "..\..\..\Documents and Settings\agoethals\Desktop\9198541.arc.gz" -o "..\..\..\Documents and Settings\agoethals\temp\fits_9198541.arc.gz.xml"
+
+
+== Unix ==
+These instructions describe how to run FITS in a terminal window. You could also run FITS on Unix using the Java API.
+
+  # Open up a terminal window.
+  # Navigate to the directory where you installed FITS
+  # If it not already, make the fits.sh file executable
+    * chmod +x fits.sh
+  # Run the script named fits.sh
+    * ./fits.sh
