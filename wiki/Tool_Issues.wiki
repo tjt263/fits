@@ -1,13 +1,31 @@
-#summary One-sentence summary of this page.
+#summary Issues found with individual tools that FITS uses
 
-= Introduction =
+= JHOVE = 
 
-Add your content here.
+  * Identification issues with: dng
+  * Creates large volume of output for COLORMAP tags containing a large number of entries
 
+= Exiftool =
 
-= Details =
+  * May report UTF-16 text as MP3
+  * Identification issues with: txt,wps,vsd
+  * Reports ZIP format version as "20" rather than "2.0"
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+= DROID =
+
+  * Identification issues with: dng
+
+= File Utility =
+
+  * Identification issues with: dng
+  * Inconsistent output format
+
+= NLNZ Metadata Extractor =
+
+  * Identification issues with: dng,zip,odb,ott,odg,otg,odp,otp,ods,ots,odc,otc,odi,oti,odf,otf,odm,oth
+  * Crashes with some GIF 89a files
+  * Default GIF XSLT outputs GIF compression twice
+
+= FFIdent =
+
+  * Identification issues with: dng,wps,vsd
