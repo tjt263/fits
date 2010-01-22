@@ -3,9 +3,9 @@
 = FITS User Guide =
 
 
-  * [http://code.google.com/p/fits/wiki/General Introduction to FITS]
-  * [http://code.google.com/p/fits/wiki/Installing Getting Started with FITS]
-  * [http://code.google.com/p/fits/wiki/Configuration Configuring FITS]
-  * [http://code.google.com/p/fits/wiki/Tools Tool Information]
-  * [http://code.google.com/p/fits/wiki/DeveloperDocumentation Documentation for Developers]
-  * [http://code.google.com/p/fits/wiki/FutureTools Future Potential Tools] <br>
+  * [http://code.google.com/p/fits/wiki/general Introduction to FITS]
+  * [http://code.google.com/p/fits/wiki/installing Getting Started with FITS]
+  * [http://code.google.com/p/fits/wiki/configuration Configuring FITS]
+  * [http://code.google.com/p/fits/wiki/tools Tool Information]
+  * [http://code.google.com/p/fits/wiki/developer_documentation Documentation for Developers]
+  * [http://code.google.com/p/fits/wiki/future_tools Future Potential Tools] <br>
