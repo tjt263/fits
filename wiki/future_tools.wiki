@@ -1,0 +1,9 @@
+#summary Tools that would be a good addition to FITS
+
+= Other Potential Tools =
+
+Other tools that would be a good fit for FITS:
+  * [http://lucene.apache.org/tika Apache Tika]
+  * [http://confluence.ucop.edu/display/JHOVE2Info/Home Jhove 2]
+  * [http://www.aduna-software.com/technologies/aperture/overview.view Aduna Aperture]
+  * [http://mediainfo.sourceforge.net Mediainfo]
