@@ -2,7 +2,7 @@
 
 =Introduction=
 
-The File Information Tool Set (FITS) identifies, validates and extracts technical metadata for a wide range of file formats.  It acts as a wrapper, invoking and managing the output from several other open source tools. Output from these tools are converted into a common format, compared to one another and consolidated into a single XML output file.  FITS is written in Java and is compatible with Java 1.5 or higher.  The external tools currently used are:
+The File Information Tool Set (FITS) identifies, validates and extracts technical metadata for a wide range of file formats.  It acts as a wrapper, invoking and managing the output from several other open source tools. Output from these tools are converted into a common format, compared to one another and consolidated into a single XML output file.  FITS is written in Java and is compatible with Java 1.6 or higher.  The external tools currently used are:
   * [http://hul.harvard.edu/jhove/ Jhove]
   * [http://www.sno.phy.queensu.ca/~phil/exiftool/ Exiftool]
   * [http://meta-extractor.sourceforge.net/ National Library of New Zealand Metadata Extractor]
