@@ -7,3 +7,4 @@ Other tools that would be a good fit for FITS:
   * [http://confluence.ucop.edu/display/JHOVE2Info/Home Jhove 2]
   * [http://www.aduna-software.com/technologies/aperture/overview.view Aduna Aperture]
   * [http://mediainfo.sourceforge.net Mediainfo]
+  * [https://github.com/openplanets/fido fido] - [https://github.com/openplanets/fido discussion]
