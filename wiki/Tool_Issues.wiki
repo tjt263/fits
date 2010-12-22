@@ -14,6 +14,7 @@
 = DROID =
 
   * Identification issues with: dng
+  * Identifies JPX files as JP2
 
 = File Utility =
 
