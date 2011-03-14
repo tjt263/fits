@@ -22,7 +22,7 @@ Windows .bat file and Linux/OS X shell launcher scripts are provided.  These scr
 
 ==Command Line Options==
  * -i The input file you want to examine
- * -o The destination fo the output XML file.
+ * -o The destination of the output XML file.
  * -h Prints the usage message
  * -v Displays the FITS version number
  * -x convert FITS output to a standard metadata schema
