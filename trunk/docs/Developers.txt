@@ -1,0 +1,108 @@
+#developer, testing and API information
+
+=API=
+
+
+
+=Usage in Other Projects=
+
+{{{
+
+Fits fits = new Fits("FITS_HOME"); 
+FitsOutput fitsOut = fits.examine(input);
+fitsOutput.saveToDisk("output/path/to/file");
+
+}}}
+
+Fits_HOME is the directory containing the xml and tools directories.
+All required FITS jars will need to be on the classpath.
+
+The FITS XML can be retrieved from FitsOutput as a JDOM object:
+`FitsOutput.getFitsXml()`
+
+Several convenience methods are provided. (not a complete list)
+
+Test for an element with name:
+`boolean hasElement = fitsOutput.hasMetadataElement("name");`
+
+Get a single element with name:
+`FitsMetadataElement element = fitsOutput.getMetadataElement("name");`
+
+Get a list of all elements with name:
+`List<FitsMetadataElement> elements = fitsOutput.getMetadataElements("name");`
+
+Get a list of all elements in the FileInfo section:
+`List<FitsMetadataElement> elements = fitsOutput.getFileInfoElements();`
+
+Get a list of all elements in the FileStatus section:
+`List<FitsMetadataElement> elements = fitsOutput.getFileStatusElements();`
+
+Get Technical metadata type (image, text, audio, document):
+`String type = fitsOutput.getTechMetadataType();`
+
+Get a list of all elements in the technical metadata section:
+`List<FitsMetadataElement> elements = fitsOutput.getTechMetadataElements();`
+
+Test for conflicting metadata values with name:
+`Boolean hasConflict = hasConflictingMetadataElements("name");`
+
+
+
+=Adding a Tool=
+
+Any type of tool, whether it's based on Perl, Java, or somethign else entirely can be added to FITS.
+A tool wrapper must be created the encapsulates the complexities of invoking the tool, capturing the output, and coverting it to FITS XML.
+
+For example Exiftool is written in Perl.  The Exiftool tool wrapper checks for the operating system type and if Perl is installed.
+It then can decide if it should use the system default version of perl with the standard version of Exiftool.  
+If the OS is Windows then the windows executable version of exiftool is used.
+
+It is the responsibility of the the tool wrapper to convert the tool output into FITS XML and return a ToolOutput object.
+
+For tools that natively return XML, XSLT can be used to convert the output to FITS XML.  For tools that don't return XML, the output can
+either be directly converted to FITS XML, or converted to a basic intermediate XML format and then converted using XSLT.
+
+The tool wrapper must implement the Tool interface.  If the tool depends on a specific operating system, the necessary checks should
+be made within the tool wrapper to prevent execution on incompatible systems.
+
+New tool wrappers must be added to the xml/fits.xml configuration file.  FITS handles initializing the wrapper and invoking it agains the input file.
+
+FITS generally prefers to use text labels rather than numeric values for technical metadata.  For example, an image's Resolution Unit should be "inches"
+instead of the value 2.  If a tool prefers to output numeric values then these should be converted using either the FITS mapping file,
+or during the conversion process from the native tool output to FITS xml.
+
+The ToolBase abstract class implements the Tool interface and provides methods for appling XSLT transforms, checking for unknown identities and excluded
+extensions.
+
+=Overview of Interfaces=
+
+==Tool==
+
+The Tool interface defines the following methods:
+`ToolOutput extractInfo(File file)` -- Called by FITS to invoke the tool against the input file.  It must return a ToolOutput object containing valid FITS XML
+`boolean isIdentityKnown(FileIdentity identity)` -- Logic for determinig if the tool was able to identify the input file
+`ToolInfo getToolInfo()` -- Returns a ToolInfo object describing the tool.
+`Boolean canIdentify()` -- indicates if the the tool can identify file formats.  This is important to know for output consolidation purposes.
+`addExcludedExtension()` -- Adds a file extension that FITS should not use this tool wrapper to processes (set from xml/fits.xml tool definitions)
+`hasExcludedExtension(String ext)` -- Checks if the tool can processes the provided file extension.
+
+==ToolOutputConsolidator==
+The ToolOutputConsolidator interface defines one method:
+`FitsOutput processResults(List<ToolOutput> results);`
+
+Classes implementing the ToolOutputConsolidator must accept a list of ToolOutput objects, merge them, and return a FitsOutput object.
+
+
+=Test Suite=
+
+A basic test suite is provided.  The launcher scripts (testoutput.bat, testoutput.sh) can be run in 'create' or 'test' mode.  Running in 
+create mode will call fits on all files in the tests/input directory, writing the output to tests/output.  Running in 'test' mode will 
+call fits against all files in tests/input, and compare the output to the corresponding output file in tests/output. The structure and element 
+values are compared, while any attribute differences are ignored.  Attributes in the fits output generally contain timestamps or tool 
+version numbers, which could change if a tool is updated to newer version.
+
+Note that changing the fits.xml configuration or adding a new tool will require running the output test in 'create' mode to rebuild the output files.
+
+A jUnit test is also provided for comparing the output.
+
+=UML Diagrams=

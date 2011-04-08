@@ -1,0 +1,51 @@
+#Configuration files overview
+
+=Configuration File=
+
+The primary configuration file is xml/fits.xml.  
+The two 
+
+==tools==
+
+Tool wrappers are defined by <tool> elements. The specified order determines your preference in favoring one tool over another.
+Tool elements must have a 'class' attribute specifying the full java classpath to the class that implements the Tool interface.
+the 'exclude-ets' attribute is optional.  It specifies file extentions that the tool should not process.  This is useful if you
+know a tool missidentifies or generates inacurate metadata for specific types of files.
+
+==output==
+
+<dataConsolidator>  Specifies the class to use for the consolidating the tool output.
+			It's possible to use custom logic to control the tool output consolidation processes by creating a class implementing
+			the ToolOutputConsolidator interface. 
+<display-tool-output> Option for appending the native output for each tool onto the end of the final consolidated FITS xml output.
+<report-conflicts> Option for controling the display of conflicts.  If set to true conflicts will be shown in the final fits xml output.
+			If set to false, only the output from the most preferred tool (controlled by the ordering of the tool elements) will be displayed.
+<validate-tool-output> Generally this should be set to true.  Setting it to false will disable schema validation of the output from each tool
+<internal-output-schema> Local reference to the fits xml schema used for validating tool output.
+<external-output-schema> Remote location of the schema referenced when creating the final consolidated fits xml.
+
+=Mapping File=
+
+The mapping file allows for swapping one value for another on a tool by tool, element by element basis.  It is a single xml file, xml/fits_xml_map.xml.
+For example, if Jhove output the value "2" as the sampling frequncy unit for a image, and you wanted to use the text string "inches" instead, you could add an entry to fits_xml_map.xml.
+Mappings are applied automatically when a tool creates its FITS output, prior to output consolidation.  You must specify the tool name, version,
+and element name that you want mapped.  Curently all mapping related needs are handled in the tool's XSLT.
+
+=Format Tree=
+
+Certain formats are a more specific subset of a more general format. The format tree (xml/fits_format_tree.xml) specifies these relationships.  During
+output consolidation the format tree is consulted, and any less specific identities are throw out. For example, Open Office document formats are ZIP based. Some tools identify
+these files as ZIP, and others as ODT.  Any tools identifying the file as a ZIP would be discarded.
+
+=How to Add a New Format=
+
+Certain tools can identify and extract technical metadata for files (Jhove, Exiftool, NLNZ ME), others can only identify files (Droid, FFident, File Utility).
+Support for which formats can have technical metadata extracted varies depeninding on the tool.  Jhove and NLNZ ME support a limited set of popular
+formats, while Exiftool supports a wide range.  All formats that Jhove and NLNZ ME support are already represented in FITS.  
+
+To add a new FITS supported format for Exiftool:
+1) Decide if the new format fits into one of the already supported format types (image, text, audio, document)
+2a) If it does not, add the new metadata type to the fits schemas.
+2b) Create a xslt file to transform the standard Exiftool output into FITS XML.
+3) Add the format type to transform mapping to Exiftools xslt map (xml/exiftool/exiftool_xslt_map.xml)
+ 
