@@ -18,6 +18,7 @@
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="SINGLE_RESULT"/>
 			<xs:enumeration value="CONFLICT"/>
+			<xs:enumeration value="PARTIAL"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:attributeGroup name="nameVersionStatusAttrGrp">
@@ -114,11 +115,11 @@
 	<!-- metadata types -->
 	<xs:complexType name="metadataType">
 		<xs:choice>
-			<xs:element name="image" type="technicalMetadata"/>
-			<xs:element name="text" type="technicalMetadata"/>
-			<xs:element name="document" type="technicalMetadata"/>
-			<xs:element name="audio" type="technicalMetadata"/>
-			<xs:element name="video" type="technicalMetadata"/>
+			<xs:element name="image" type="technicalMetadata" minOccurs="0"/>
+			<xs:element name="text" type="technicalMetadata" minOccurs="0"/>
+			<xs:element name="document" type="technicalMetadata" minOccurs="0"/>
+			<xs:element name="audio" type="technicalMetadata" minOccurs="0"/>
+			<xs:element name="video" type="technicalMetadata" minOccurs="0"/>
 		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="technicalMetadata">
