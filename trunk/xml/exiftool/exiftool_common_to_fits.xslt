@@ -79,6 +79,9 @@
 				<xsl:when test="$format='TIFF'">
 					<xsl:value-of select="string('Tagged Image File Format')"/>						
 				</xsl:when>
+				<xsl:when test="$format='TIFF EXIF'">
+					<xsl:value-of select="string('Tagged Image File Format')"/>						
+				</xsl:when>
 				<xsl:when test="$format='BMP'">
 					<xsl:value-of select="string('Windows Bitmap')"/>		
 				</xsl:when>
