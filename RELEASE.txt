@@ -2,6 +2,7 @@ RELEASE NOTES
 -------------
 
 - added <filepath> element to FileInfo tool, updated fits_output.xsd
+- Fixed bug normalizing Exiftool format output for TIFFs. "TIFF EXIF" is not output as "Tagged Image File Format" 
 
 Version 0.5.0 (2/24/11)
 ----------------------
