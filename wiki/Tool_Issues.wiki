@@ -10,6 +10,7 @@
   * May report UTF-16 text as MP3
   * Identification issues with: txt,wps,vsd
   * Reports ZIP format version as "20" rather than "2.0"
+  * Identifies wpg (wordperfect drawing) as fpx
 
 = DROID =
 
@@ -20,6 +21,7 @@
 
   * Identification issues with: dng
   * Inconsistent output format
+  * Identifies wpg (wordperfect drawing) as excel
 
 = NLNZ Metadata Extractor =
 
@@ -30,3 +32,4 @@
 = FFIdent =
 
   * Identification issues with: dng,wps,vsd
+  * Identifies wpg (wordperfect drawing) as excel
