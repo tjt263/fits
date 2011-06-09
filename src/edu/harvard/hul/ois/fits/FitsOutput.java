@@ -255,8 +255,9 @@ public class FitsOutput {
         // This can have an image, document, text, or audio subelement.
         Element subElem = metadata.getChild ("image",ns);
         if (subElem != null) {
+        	Element fileinfo = fitsXml.getRootElement().getChild("fileinfo",ns);
             // Process image metadata...
-        	return (Mix) conv.toMix (subElem);
+        	return (Mix) conv.toMix (subElem,fileinfo);
         }
         subElem = metadata.getChild ("text",ns);
         if (subElem != null) {

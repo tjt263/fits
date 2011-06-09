@@ -53,7 +53,7 @@ public class XmlContentConverter {
      * 
      *  @param  fitsImage   an image element in the FITS schema
      */
-    public XmlContent toMix (Element fitsImage) {
+    public XmlContent toMix (Element fitsImage, Element fileinfo) {
         MixModel mm = new MixModel ();
         try {
             for (ImageElement fitsElem : ImageElement.values()) {
@@ -532,6 +532,12 @@ public class XmlContentConverter {
                     }
                 }
             }
+            if(fileinfo != null) {
+            	Element created = fileinfo.getChild (ImageElement.created.toString(),ns);
+            	if(created != null) {
+            		mm.icm.getGeneralCaptureInformation().setDateTimeCreated(created.getText().trim());
+            	}
+            }
         }
         catch (XmlContentException e) {
             System.out.println ("Invalid content: " + e.getMessage ());
@@ -890,7 +896,8 @@ public class XmlContentConverter {
         digitalCameraModelName("digitalCameraModelName"),
         digitalCameraModelNumber("digitalCameraModelNumber"),
         digitalCameraModelSerialNo("digitalCameraModelSerialNo"),
-        digitalCameraManufacturer("digitalCameraManufacturer");
+        digitalCameraManufacturer("digitalCameraManufacturer"),
+        created("created");
         
         private String name;
         
