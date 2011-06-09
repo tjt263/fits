@@ -30,6 +30,7 @@ package edu.harvard.hul.ois.fits;
 
 
 import java.io.File;
+import java.text.ParseException;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -38,6 +39,7 @@ import edu.harvard.hul.ois.fits.consolidation.FitsIdentitySection;
 import edu.harvard.hul.ois.ots.schemas.XmlContent.Rational;
 import edu.harvard.hul.ois.ots.schemas.XmlContent.XmlContent;
 import edu.harvard.hul.ois.ots.schemas.XmlContent.XmlContentException;
+import edu.harvard.hul.ois.ots.schemas.XmlContent.XmlDateFormat;
 import edu.harvard.hul.ois.ots.schemas.MIX.Compression;
 import edu.harvard.hul.ois.ots.schemas.MIX.YCbCrSubSampling;
 
@@ -535,7 +537,14 @@ public class XmlContentConverter {
             if(fileinfo != null) {
             	Element created = fileinfo.getChild (ImageElement.created.toString(),ns);
             	if(created != null) {
-            		mm.icm.getGeneralCaptureInformation().setDateTimeCreated(created.getText().trim());
+            		String date = null;
+            		try {
+            			date = XmlDateFormat.exifDateTimeToXml(created.getText().trim());
+            		}
+            		catch(ParseException e) {
+            			e.printStackTrace();
+            		}
+            		mm.icm.getGeneralCaptureInformation().setDateTimeCreated(date);
             	}
             }
         }

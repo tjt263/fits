@@ -1,8 +1,11 @@
 RELEASE NOTES
 -------------
 
+Version 0.5.1 (--/--/--)
+----------------------
 - added <filepath> element to FileInfo tool, updated fits_output.xsd
-- Fixed bug normalizing Exiftool format output for TIFFs. "TIFF EXIF" is not output as "Tagged Image File Format" 
+- Fixed bug normalizing Exiftool format output for TIFFs. "TIFF EXIF" is not output as "Tagged Image File Format"
+- using <fileinfo>/<created> value for <mix:GeneralCaptureInformation>/<mix:dateTimeCreated>  when using -x switch 
 
 Version 0.5.0 (2/24/11)
 ----------------------

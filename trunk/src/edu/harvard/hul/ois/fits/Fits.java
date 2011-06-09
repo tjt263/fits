@@ -72,7 +72,7 @@ public class Fits {
 	public static String internalOutputSchema;
 	public static String fitsXmlNamespace;
 	
-	public static String VERSION = "0.5.0";
+	public static String VERSION = "0.5.1";
 	
 	private ToolOutputConsolidator consolidator;
 	private ToolBelt toolbelt;
