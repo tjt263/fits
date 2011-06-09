@@ -89,7 +89,7 @@ public class XmlContentConverterTest extends XMLTestCase {
         imgElem.addContent (elem);
         
         XmlContentConverter conv = new XmlContentConverter ();
-        Mix mix = (Mix) conv.toMix (imgElem);
+        Mix mix = (Mix) conv.toMix (imgElem,null);
         BasicDigitalObjectInformation bdoi = mix.getBasicDigitalObjectInformation();
         String byteOrder = bdoi.getByteOrder().toString ();
         assertEquals ("big endian", byteOrder);
