@@ -19,6 +19,7 @@
 			<xs:enumeration value="SINGLE_RESULT"/>
 			<xs:enumeration value="CONFLICT"/>
 			<xs:enumeration value="PARTIAL"/>
+			<xs:enumeration value="UNKNOWN"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:attributeGroup name="nameVersionStatusAttrGrp">
