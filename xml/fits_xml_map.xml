@@ -31,8 +31,8 @@
 				<map from="Landscape" to="Landscape mode (for landscape photos with the background in focus)"/>
 			</element>
 			<element name="meteringMode">
-				<map from="Center-weighted average" to="center weighted average"/>
-				<map from="Multi-spot" to="multispot"/>
+				<map from="Center-weighted average" to="Center weighted average"/>
+				<map from="Multi-spot" to="Multispot"/>
 				<map from="Evaluative" to="Pattern"/>
 				<map from="Multi-segment" to="Pattern"/>
 			</element>
