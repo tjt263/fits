@@ -13,6 +13,7 @@ Formats Supported: jpg,tiff,jp2,gif,wave,aiff,xml,html,ascii,utf-8,pdf.
 
 Notes: 
  * For JP2 files the JHOVE output element Transformation indicates whether the compression is lossy or lossless. The transformation values are described in Table A-20 of the JPEG2000 part 1 specification. A value of 0 maps to the 9-7 irreversible (lossy) filter. A value of 1 maps to 5-3 reversible (lossless) filter. This JHOVE element is used by FITS when it outputs the compressionScheme in the image metadata, writing it as JPEG 2000 Lossy or JPEG 2000 Lossless.
+ * JHOVE does not validate the codestream but it check the file structure.
 
 = Exiftool =
 
