@@ -18,7 +18,7 @@
  */
 package edu.harvard.hul.ois.fits.exceptions;
 
-public abstract class FitsException extends Exception {
+public class FitsException extends Exception {
 	
 	/**
 	 * generated serial id

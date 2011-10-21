@@ -538,10 +538,14 @@ public class OISConsolidator implements ToolOutputConsolidator {
 			Element identElement = new Element("identity",fitsNS);
 			Attribute identFormatAttr = new Attribute("format",identSection.getFormat());
 			Attribute identMimeAttr = new Attribute("mimetype",identSection.getMimetype());
+			Attribute fitsToolName = new Attribute("toolname",identSection.getToolName());
+			Attribute fitsToolVersion = new Attribute("toolversion",identSection.getToolVersion());
 		
 			//set format and mimetype attributes
 			identElement.setAttribute(identFormatAttr);
 			identElement.setAttribute(identMimeAttr);
+			identElement.setAttribute(fitsToolName);
+			identElement.setAttribute(fitsToolVersion);
 			
 			//add reporting tools
 			for(ToolInfo info : identSection.getReportingTools()) {
