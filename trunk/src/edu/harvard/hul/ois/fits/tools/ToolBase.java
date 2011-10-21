@@ -45,12 +45,14 @@ public abstract class ToolBase implements Tool {
 	protected SAXBuilder saxBuilder;
 	protected TransformerFactory tFactory;
     protected Hashtable transformMap;
+    protected File inputFile;
+
     
     private List<String> excludedExtensions;
 	
 	public ToolBase() throws FitsToolException {
 		info = new ToolInfo();
-		//System.setProperty("javax.xml.transform.TransformerFactory","net.sf.saxon.TransformerFactoryImpl");
+		System.setProperty("javax.xml.transform.TransformerFactory","net.sf.saxon.TransformerFactoryImpl");
 		tFactory = TransformerFactory.newInstance ();
 		saxBuilder = new SAXBuilder();
 		excludedExtensions = new ArrayList<String>();
@@ -62,6 +64,10 @@ public abstract class ToolBase implements Tool {
 	
 	public Boolean canIdentify() {
 		return true;
+	}
+	
+	public void setInputFile(File file) {
+		inputFile = file;
 	}
 	
 	public boolean isIdentityKnown(FileIdentity identity) {
@@ -120,8 +126,25 @@ public abstract class ToolBase implements Tool {
 		return false;
 	}
 	
+	public ToolOutput getOutput() {
+		return output;
+	}
+	
 	public void resetOutput() {
 		output = null;
+	}
+	
+	public void run() {
+		try {
+			//java.util.Date time = new java.util.Date();
+			//System.out.println(new java.sql.Time(time.getTime()) + " STARTING "+this.getClass());
+			output = extractInfo(inputFile);
+			//java.util.Date time2 = new java.util.Date();
+			//System.out.println(new java.sql.Time(time2.getTime()) +" FINISHED "+this.getClass());
+		} catch (FitsToolException e) {
+			e.printStackTrace();
+			//System.err.println(e.getMessage());
+		}
 	}
 
 }

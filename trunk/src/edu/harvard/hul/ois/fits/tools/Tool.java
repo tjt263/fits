@@ -23,7 +23,7 @@ import edu.harvard.hul.ois.fits.exceptions.FitsToolException;
 import edu.harvard.hul.ois.fits.identity.FileIdentity;
 
 
-public interface Tool {
+public interface Tool extends Runnable {
 		
 	/**
 	 * Extracts the identification and metadata from the provided file
@@ -73,4 +73,8 @@ public interface Tool {
 	public boolean isEnabled();
 	
 	public void setEnabled(boolean value);
+	
+	public void setInputFile(File file);
+	
+	public ToolOutput getOutput();
 }

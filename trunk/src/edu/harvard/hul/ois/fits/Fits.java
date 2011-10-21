@@ -135,7 +135,7 @@ public class Fits {
 		Fits fits = new Fits();
 		
 		Options options = new Options();
-		options.addOption("i", true, "input file");
+		options.addOption("i", true, "input file or directory");
 		options.addOption("o", true, "output file");
 		options.addOption("x",false,"convert FITS output to a standard metadata schema");
 		options.addOption("h",false,"print this message");
@@ -153,15 +153,20 @@ public class Fits {
 			System.exit(0);
 		}
 		
-		FitsOutput result = null;
 		if(cmd.hasOption("i")) {
 			String input = cmd.getOptionValue("i");	
-			File inputFile = new File(input);			
-			result = fits.examine(inputFile);	
-			if(result.getCaughtExceptions().size() > 0) {
-				for(Exception e: result.getCaughtExceptions()) {
-					System.err.println("Warning: " + e.getMessage());
+			File inputFile = new File(input);
+			
+			if(inputFile.isDirectory()) {
+				String outputDir = cmd.getOptionValue("o");
+				if(outputDir == null || !(new File(outputDir).isDirectory())) {
+					throw new FitsException("When FITS is run in directory processing mode the output location must be a diretory");
 				}
+				fits.doDirectory(inputFile,new File(outputDir),cmd.hasOption("x"));
+			}
+			else {
+				FitsOutput result = fits.doSingleFile(inputFile);
+				fits.outputResults(result,cmd.getOptionValue("o"),cmd.hasOption("x"),false);
 			}
 		}
 		else {
@@ -170,18 +175,72 @@ public class Fits {
 			System.exit(-1);
 		}
 	    
+
+		
+		System.exit(0);
+	}
+	
+	/**
+	 * Recursively processes all files in the directory.
+	 * @param intputFile
+	 * @param useStandardSchemas
+	 * @throws IOException 
+	 * @throws XMLStreamException 
+	 * @throws FitsException 
+	 */
+	private void doDirectory(File inputDir, File outputDir, boolean useStandardSchemas) throws FitsException, XMLStreamException, IOException {
+		for(File f : inputDir.listFiles()) {
+			if(f.isDirectory()) {
+				doDirectory(f, outputDir, useStandardSchemas);
+			}
+			else {
+				FitsOutput result = doSingleFile(f);
+				String outputFile = outputDir.getPath() + f.getName() + ".fits.xml";
+				outputResults(result,outputFile,useStandardSchemas,true);
+			}
+		}
+	}
+	
+	
+	/**
+	 * processes a single file and outputs to the provided output location. Outputs to 
+	 * standard out if outputLocation is null
+	 * @param inputFile
+	 * @param outputLocation
+	 * @param useStandardSchemas - use standard schemas if available for output type
+	 * @throws FitsException
+	 * @throws XMLStreamException
+	 * @throws IOException
+	 */
+	private FitsOutput doSingleFile(File inputFile) throws FitsException, XMLStreamException, IOException {
+		
+		FitsOutput result = this.examine(inputFile);	
+		if(result.getCaughtExceptions().size() > 0) {
+			for(Exception e: result.getCaughtExceptions()) {
+				System.err.println("Warning: " + e.getMessage());
+			}
+		}
+		return result;
+	}
+	
+	private void outputResults(FitsOutput result, String outputLocation, boolean standardSchema, boolean dirMode) throws XMLStreamException, IOException, FitsException {
+		
 	    Document doc = result.getFitsXml();
 
+	    //figure out the output location
 	    OutputStream out = null;
-		if(cmd.hasOption("o")) {
-			out = new FileOutputStream(cmd.getOptionValue("o"));
+		if(outputLocation != null) {
+			out = new FileOutputStream(outputLocation);
 		}
-		else {		
+		else if(!dirMode) {		
 			out = System.out;
+		}
+		else {
+			throw new FitsException("The output location must be provided when running FITS in directory mode");
 		}
 		
 		//if -x is set, then convert to standard metadata schema and output to -o
-		if(cmd.hasOption("x")) {
+		if(standardSchema) {
 			outputStandardSchemaXml(result,out);
 		}
 		//else output FITS XML to -o
@@ -190,8 +249,6 @@ public class Fits {
 			serializer.output(doc, out);
 		}
 		out.close();
-		
-		System.exit(0);
 	}
 	
 	public static void outputStandardSchemaXml(FitsOutput fitsOutput, OutputStream out) throws XMLStreamException, IOException {
@@ -253,7 +310,9 @@ public class Fits {
 		formatter.printHelp("fits", opts );
 	}
 	
-	public FitsOutput examine(File input) throws FitsException {	
+	/* ORIGINAL EXAMINE METHOD WITHOUT THREADS
+	 
+	public FitsOutput examineOriginal(File input) throws FitsException {	
 		if(!input.exists()) {
 			throw new FitsConfigurationException(input+" does not exist or is not readable");
 		}
@@ -278,6 +337,57 @@ public class Fits {
 			}
 		}
 
+		
+		// consolidate the results into a single DOM
+		FitsOutput result = consolidator.processResults(toolResults);
+		result.setCaughtExceptions(caughtExceptions);
+		
+		for(Tool t: toolbelt.getTools()) {
+			t.resetOutput();
+		}
+		
+		return result;	
+	}
+	*/
+	
+	public FitsOutput examine(File input) throws FitsException {	
+		if(!input.exists()) {
+			throw new FitsConfigurationException(input+" does not exist or is not readable");
+		}
+				
+		List<ToolOutput> toolResults = new ArrayList<ToolOutput>();
+		
+		//run file through each tool, catching exceptions thrown by tools
+		List<Exception> caughtExceptions = new ArrayList<Exception>();
+		String path = input.getPath().toLowerCase();
+		String ext = path.substring(path.lastIndexOf(".")+1);
+		
+		ArrayList<Thread> threads = new ArrayList<Thread>();
+		for(Tool t : toolbelt.getTools()) {			
+			if(t.isEnabled()) {
+				if(!t.hasExcludedExtension(ext)) {
+					//spin up new threads
+					t.setInputFile(input);
+					Thread thread = new Thread(t);
+					threads.add(thread);
+					thread.start();
+				}
+			}
+		}
+		
+		//wait for them all to finish
+		for(Thread thread : threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		//get all output from the tools
+		for(Tool t: toolbelt.getTools()) {
+			toolResults.add(t.getOutput());
+		}
 		
 		// consolidate the results into a single DOM
 		FitsOutput result = consolidator.processResults(toolResults);

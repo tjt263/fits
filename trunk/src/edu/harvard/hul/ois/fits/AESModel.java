@@ -69,7 +69,7 @@ public class AESModel {
     	
     	//set up base AES object structure    	
         aes = new AudioObject ();
-        aes.setSchemaVersion("1.0");
+        aes.setSchemaVersion("1.0.0");
         aes.setID(audioObjectID);
         aes.setDisposition("");
         Identifier ident = new Identifier("","primaryIdentifier");

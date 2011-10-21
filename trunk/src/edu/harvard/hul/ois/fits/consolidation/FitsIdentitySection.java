@@ -21,6 +21,7 @@ package edu.harvard.hul.ois.fits.consolidation;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.harvard.hul.ois.fits.Fits;
 import edu.harvard.hul.ois.fits.identity.ExternalIdentifier;
 import edu.harvard.hul.ois.fits.identity.FileIdentity;
 import edu.harvard.hul.ois.fits.identity.FormatVersion;
@@ -33,6 +34,8 @@ import edu.harvard.hul.ois.fits.tools.ToolInfo;
 public class FitsIdentitySection {
 	private String format;
 	private String mimetype;
+	private String toolName;
+	private String toolVersion;
 	private List<FormatVersion> formatVersions = new ArrayList<FormatVersion>();
 	private List<ToolInfo> reportingTools = new ArrayList<ToolInfo>();
 	private List<ExternalIdentifier> externalIDs = new ArrayList<ExternalIdentifier>();
@@ -44,6 +47,8 @@ public class FitsIdentitySection {
 	public FitsIdentitySection(FileIdentity identity) {
 		this.format = identity.getFormat();
 		this.mimetype = identity.getMime();
+		toolName= "FITS";
+		toolVersion = Fits.VERSION;
 		if(identity.getFormatVersionValue() != null) {
 			formatVersions.add(identity.getFormatVersion());
 		}
@@ -152,4 +157,12 @@ public class FitsIdentitySection {
 		}
 	}
 
+	public String getToolName() {
+		return toolName;
+	}
+
+	public String getToolVersion() {
+		return toolVersion;
+	}
+	
 }
