@@ -72,10 +72,12 @@ public class Fits {
 	public static String internalOutputSchema;
 	public static String fitsXmlNamespace;
 	
-	public static String VERSION = "0.5.1";
+	public static String VERSION = "0.6.0";
 	
 	private ToolOutputConsolidator consolidator;
 	private ToolBelt toolbelt;
+	
+	private static boolean traverseDirs;
 	
 	public Fits() throws FitsException {
 		this(null);
@@ -135,8 +137,9 @@ public class Fits {
 		Fits fits = new Fits();
 		
 		Options options = new Options();
-		options.addOption("i", true, "input file or directory");
-		options.addOption("o", true, "output file");
+		options.addOption("i",true, "input file or directory");
+		options.addOption("r",false,"process directories recursively when -i is a directory ");
+		options.addOption("o",true, "output file");
 		options.addOption("x",false,"convert FITS output to a standard metadata schema");
 		options.addOption("h",false,"print this message");
 		options.addOption("v",false,"print version information");
@@ -151,6 +154,13 @@ public class Fits {
 		if(cmd.hasOption("v")) {
 			System.out.println(Fits.VERSION);
 			System.exit(0);
+		}
+		
+		if(cmd.hasOption("r")) {
+			traverseDirs = true;
+		}
+		else {
+			traverseDirs = false;
 		}
 		
 		if(cmd.hasOption("i")) {
@@ -190,12 +200,12 @@ public class Fits {
 	 */
 	private void doDirectory(File inputDir, File outputDir, boolean useStandardSchemas) throws FitsException, XMLStreamException, IOException {
 		for(File f : inputDir.listFiles()) {
-			if(f.isDirectory()) {
+			if(f.isDirectory() && traverseDirs) {
 				doDirectory(f, outputDir, useStandardSchemas);
 			}
-			else {
+			else if(f.isFile()) {
 				FitsOutput result = doSingleFile(f);
-				String outputFile = outputDir.getPath() + f.getName() + ".fits.xml";
+				String outputFile = outputDir.getPath() + File.separator + f.getName() + ".fits.xml";
 				outputResults(result,outputFile,useStandardSchemas,true);
 			}
 		}

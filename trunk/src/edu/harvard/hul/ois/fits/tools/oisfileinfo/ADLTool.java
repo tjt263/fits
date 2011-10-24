@@ -26,7 +26,6 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.output.XMLOutputter;
 
 import com.therockquarry.aes31.adl.ADL;
 
@@ -49,7 +48,7 @@ public class ADLTool extends ToolBase {
 	public ADLTool() throws FitsToolException {
 		info.setName("ADL Tool");
 		info.setVersion("0.1");
-		info.setDate("10/19/11");
+		info.setDate("10/24/11");
 	}
 
 	public ToolOutput extractInfo(File file) throws FitsToolException {	
@@ -70,7 +69,6 @@ public class ADLTool extends ToolBase {
 			String adlCreatorVersion = null;
 			
 			try	{
-				
 				//creating an ADL objecte should be enough to validate it as ADL
 				new ADL(file);
 								
@@ -92,13 +90,8 @@ public class ADLTool extends ToolBase {
 			    }
 			    finally {
 			      //ensure the underlying stream is always closed
-			      //this only has any effect if the item passed to the Scanner
-			      //constructor implements Closeable (which it does in this case).
 			      scanner.close();
 			    }
-				
-				//XMLOutputter xmlout = new XMLOutputter();
-				//xmlout.output(doc,System.out);
 			}
 			catch (Exception e)	{
 				throw new FitsToolException("Error parsing ADL file", e);
@@ -108,6 +101,9 @@ public class ADLTool extends ToolBase {
 			Element identity = new Element("identity",fitsNS);
 			identity.setAttribute("format","Audio Decision List");
 			identity.setAttribute("mimetype","text/x-adl");
+			Element version = new Element("version",fitsNS);
+			version.addContent(adlVersion);
+			identity.addContent(version);
 			//add identity to identification section
 			identification.addContent(identity);
 			//add identification section to root
@@ -117,11 +113,11 @@ public class ADLTool extends ToolBase {
 			Element metadata = new Element("metadata",fitsNS);
 			Element textMetadata = new Element("text",fitsNS);
 			
-			if(adlVersion!=null) {
-				//Element elem = new Element("adlVersion",fitsNS);
-				//elem.addContent(adlVersion);
-				//textMetadata.addContent(elem);
-				
+			Element markupLanguage = new Element("markupLanguage",fitsNS);
+			markupLanguage.addContent("EDML");
+			textMetadata.addContent(markupLanguage);
+			
+			if(adlVersion!=null) {				
 				Element markupLanguageVer = new Element("markupLanguageVersion",fitsNS);
 				markupLanguageVer.addContent(adlVersion);
 				textMetadata.addContent(markupLanguageVer);
