@@ -1,15 +1,15 @@
 RELEASE NOTES
 -------------
 
-Version 0.6.0 (--/--/--)
+Version 0.6.0 (10/25/11)
 ----------------------
 - Performance enhancement to make all tools run in parallel in individual threads
 - Added the ADL tool for the identification of Audio Decision List files
-- added <filepath> element to FileInfo tool, updated fits_output.xsd
-- Fixed bug normalizing Exiftool format output for TIFFs. "TIFF EXIF" is not output as "Tagged Image File Format"
-- using <fileinfo>/<created> value for <mix:GeneralCaptureInformation>/<mix:dateTimeCreated>  when using -x switch
 - Added options to process directories of files.  When -i is set to a directory -o must also be set to a directory.
   The new -r option will process directories recursively when -i is a directory. 
+- added <filepath> element to FileInfo tool, updated fits_output.xsd
+- Fixed bug in normalizing Exiftool format output for TIFFs. "TIFF EXIF" is not output as "Tagged Image File Format"
+- Fix to use <fileinfo>/<created> value for <mix:GeneralCaptureInformation>/<mix:dateTimeCreated>  when using -x switch
 
 
 Version 0.5.0 (2/24/11)
