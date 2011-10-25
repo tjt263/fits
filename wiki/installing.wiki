@@ -5,9 +5,9 @@ From this Downloads section of this website, download the file named fits-(versi
 
 Create a new directory on your computer and unzip the contents of the FITS ZIP file to the directory.
 
-= Running FITS =
+= Running FITS (command-line option) =
 
-The way you run FITS will depend on your operating system.
+The way you run FITS will depend on your operating system. *Note that FITS also has a Java API that should be considered for use when processing a large number of files on an on-going basis.* 
 
 == Windows ==
 These instructions describe how to run FITS in a Terminal window. There are other ways you could run FITS on Windows, including from the Windows Explorer, and using the Java API.
