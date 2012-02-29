@@ -7,4 +7,5 @@ Other tools that would be a good fit for FITS:
   * [http://confluence.ucop.edu/display/JHOVE2Info/Home Jhove 2]
   * [http://www.aduna-software.com/technologies/aperture/overview.view Aduna Aperture]
   * [http://mediainfo.sourceforge.net Mediainfo]
+    * Per the NARA folks: It now includes support to extract technical metadata from a wide variety of video file formats and wrappers, populate the reVTMD schema and export the data as a reVTMD schema compliant XML file.
   * [https://github.com/openplanets/fido fido] - [http://www.openplanetsfoundation.org/node/563 discussion]
