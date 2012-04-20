@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,15 +39,24 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import net.sf.saxon.event.Builder;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.jdom.Content;
 import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -72,7 +82,7 @@ public class Fits {
 	public static String internalOutputSchema;
 	public static String fitsXmlNamespace;
 	
-	public static String VERSION = "0.6.0";
+	public static String VERSION = "0.6.1";
 	
 	private ToolOutputConsolidator consolidator;
 	private ToolBelt toolbelt;
@@ -140,9 +150,14 @@ public class Fits {
 		options.addOption("i",true, "input file or directory");
 		options.addOption("r",false,"process directories recursively when -i is a directory ");
 		options.addOption("o",true, "output file");
-		options.addOption("x",false,"convert FITS output to a standard metadata schema");
 		options.addOption("h",false,"print this message");
 		options.addOption("v",false,"print version information");
+		OptionGroup outputOptions = new OptionGroup();
+		Option stdxml = new Option("x",false,"convert FITS output to a standard metadata schema");
+		Option combinedStd = new Option("xc",false,"output using a standard metadata schema and include FITS xml");
+		outputOptions.addOption(stdxml);
+		outputOptions.addOption(combinedStd);
+		options.addOptionGroup(outputOptions);
 
 		CommandLineParser parser = new GnuParser();
 		CommandLine cmd = parser.parse(options, args);
@@ -172,11 +187,11 @@ public class Fits {
 				if(outputDir == null || !(new File(outputDir).isDirectory())) {
 					throw new FitsException("When FITS is run in directory processing mode the output location must be a diretory");
 				}
-				fits.doDirectory(inputFile,new File(outputDir),cmd.hasOption("x"));
+				fits.doDirectory(inputFile,new File(outputDir),cmd.hasOption("x"),cmd.hasOption("xc"));
 			}
 			else {
 				FitsOutput result = fits.doSingleFile(inputFile);
-				fits.outputResults(result,cmd.getOptionValue("o"),cmd.hasOption("x"),false);
+				fits.outputResults(result,cmd.getOptionValue("o"),cmd.hasOption("x"),cmd.hasOption("xc"),false);
 			}
 		}
 		else {
@@ -198,15 +213,31 @@ public class Fits {
 	 * @throws XMLStreamException 
 	 * @throws FitsException 
 	 */
-	private void doDirectory(File inputDir, File outputDir, boolean useStandardSchemas) throws FitsException, XMLStreamException, IOException {
+	private void doDirectory(File inputDir, File outputDir, boolean useStandardSchemas, boolean standardCombinedFormat) throws FitsException, XMLStreamException, IOException {
 		for(File f : inputDir.listFiles()) {
 			if(f.isDirectory() && traverseDirs) {
-				doDirectory(f, outputDir, useStandardSchemas);
+				doDirectory(f, outputDir, useStandardSchemas,standardCombinedFormat);
 			}
 			else if(f.isFile()) {
 				FitsOutput result = doSingleFile(f);
 				String outputFile = outputDir.getPath() + File.separator + f.getName() + ".fits.xml";
-				outputResults(result,outputFile,useStandardSchemas,true);
+				
+				//TODO need to test this
+				File output = new File(outputFile);
+				if(output.exists()) {
+					int cnt = 1;
+					while(true) {
+						outputFile = outputDir.getPath() + File.separator + f.getName() + "-" + cnt + ".fits.xml";
+						output = new File(outputFile);
+						if(!output.exists()) {
+							break;
+						}
+						cnt++;
+					}
+				}
+				
+				
+				outputResults(result,outputFile,useStandardSchemas,standardCombinedFormat,true);
 			}
 		}
 	}
@@ -233,32 +264,77 @@ public class Fits {
 		return result;
 	}
 	
-	private void outputResults(FitsOutput result, String outputLocation, boolean standardSchema, boolean dirMode) throws XMLStreamException, IOException, FitsException {
-		
-	    Document doc = result.getFitsXml();
+	private void outputResults(FitsOutput result, String outputLocation, boolean standardSchema, boolean standardCombinedFormat, boolean dirMode) throws XMLStreamException, IOException, FitsException {
+		OutputStream out = null;
+		try {	
+		    //figure out the output location
+			if(outputLocation != null) {
+				out = new FileOutputStream(outputLocation);
+			}
+			else if(!dirMode) {		
+				out = System.out;
+			}
+			else {
+				throw new FitsException("The output location must be provided when running FITS in directory mode");
+			}
+			
+			//if -x is set, then convert to standard metadata schema and output to -o
+			if(standardSchema) {
+				outputStandardSchemaXml(result,out);
+			}
+			//if we are using -xc output FITS xml and standard format
+			else if(standardCombinedFormat) {
+				//get the normal fits xml output
+				Document doc = result.getFitsXml();
+				Namespace ns = Namespace.getNamespace(Fits.fitsXmlNamespace);
+				
+				Element metadata = (Element) doc.getRootElement().getChild("metadata",ns); 
+				Element techmd = null;
+				if(metadata.getChildren().size() > 0) {
+					techmd = (Element) metadata.getChildren().get(0);
+				}
 
-	    //figure out the output location
-	    OutputStream out = null;
-		if(outputLocation != null) {
-			out = new FileOutputStream(outputLocation);
-		}
-		else if(!dirMode) {		
-			out = System.out;
-		}
-		else {
-			throw new FitsException("The output location must be provided when running FITS in directory mode");
-		}
+				//if we have technical metadata convert it to the standard form
+				if(techmd != null && techmd.getChildren().size() > 0) {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					outputStandardSchemaXml(result,baos);
+					String stdxml = baos.toString("UTF-8");
+					
+					try {
+						StringReader sReader = new StringReader(stdxml);
+						SAXBuilder saxBuilder = new SAXBuilder();
+						Document stdXmlDoc = saxBuilder.build(sReader);
+						Element stdElement = new Element("standard",ns);
+						stdElement.addContent(stdXmlDoc.getRootElement().detach());
+						techmd.addContent(stdElement);
+						
+					}
+					catch(JDOMException e) {
+						throw new FitsException("error converting standard XML", e);
+					}
+				}
+				
+				//output the merged JDOM object
+				XMLOutputter serializer = new XMLOutputter(Format.getPrettyFormat());
+				serializer.output(doc, out);
+			}
+			//else output FITS XML to -o
+			else {
+				Document doc = result.getFitsXml();
+				XMLOutputter serializer = new XMLOutputter(Format.getPrettyFormat());
+				serializer.output(doc, out);
+			}
 		
-		//if -x is set, then convert to standard metadata schema and output to -o
-		if(standardSchema) {
-			outputStandardSchemaXml(result,out);
 		}
-		//else output FITS XML to -o
-		else {
-			XMLOutputter serializer = new XMLOutputter(Format.getPrettyFormat());
-			serializer.output(doc, out);
+		finally {
+			if(out != null) {
+				out.close();
+			}
 		}
-		out.close();
+	}
+	
+	public static void outputCombinedFormat() {
+		
 	}
 	
 	public static void outputStandardSchemaXml(FitsOutput fitsOutput, OutputStream out) throws XMLStreamException, IOException {

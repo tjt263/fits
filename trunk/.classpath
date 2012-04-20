@@ -21,7 +21,7 @@
 	<classpathentry kind="lib" path="lib/droid/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/droid/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/jhove/jhove-handler.jar"/>
-	<classpathentry kind="lib" path="lib/jhove/jhove.jar"/>
+	<classpathentry kind="lib" path="lib/jhove/jhove.jar" sourcepath="/jhove"/>
 	<classpathentry kind="lib" path="lib/jhove/JhoveApp.jar"/>
 	<classpathentry kind="lib" path="lib/jhove/jhove-module.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
