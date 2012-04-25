@@ -23,9 +23,11 @@ Windows .bat file and Linux/OS X shell launcher scripts are provided.  These scr
 ==Command Line Options==
  * -i The input file you want to examine
  * -o The destination of the output XML file.
+ * -r process directories recursively when -i is a directory
  * -h Prints the usage message
  * -v Displays the FITS version number
  * -x convert FITS output to a standard metadata schema
+ * -xc output using a standard metadata schema and include FITS xml
 
 If -o is not specified then the output is sent to the console window.
 
