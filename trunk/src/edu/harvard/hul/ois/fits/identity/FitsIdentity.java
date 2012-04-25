@@ -16,22 +16,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FITS.  If not, see <http://www.gnu.org/licenses/>.
  */
-package edu.harvard.hul.ois.fits.consolidation;
+package edu.harvard.hul.ois.fits.identity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.harvard.hul.ois.fits.Fits;
-import edu.harvard.hul.ois.fits.identity.ExternalIdentifier;
-import edu.harvard.hul.ois.fits.identity.FileIdentity;
-import edu.harvard.hul.ois.fits.identity.FormatVersion;
+import edu.harvard.hul.ois.fits.consolidation.VersionComparer;
 import edu.harvard.hul.ois.fits.tools.ToolInfo;
 /**
  * Wraps FileIdentity with the tool information that reported it
  * @author spmcewen
  *
  */
-public class FitsIdentitySection {
+public class FitsIdentity {
 	private String format;
 	private String mimetype;
 	private String toolName;
@@ -40,11 +38,12 @@ public class FitsIdentitySection {
 	private List<ToolInfo> reportingTools = new ArrayList<ToolInfo>();
 	private List<ExternalIdentifier> externalIDs = new ArrayList<ExternalIdentifier>();
 	
-	public FitsIdentitySection() {
-		
+	public FitsIdentity() {
+		toolName= "FITS";
+		toolVersion = Fits.VERSION;
 	}
 	
-	public FitsIdentitySection(FileIdentity identity) {
+	public FitsIdentity(ToolIdentity identity) {
 		this.format = identity.getFormat();
 		this.mimetype = identity.getMime();
 		toolName= "FITS";
@@ -72,7 +71,7 @@ public class FitsIdentitySection {
 		this.mimetype = mimetype;
 	}
 	
-	public FitsIdentitySection(String format, String mimetype) {
+	public FitsIdentity(String format, String mimetype) {
 		this.format = format;
 		this.mimetype = mimetype;
 	}

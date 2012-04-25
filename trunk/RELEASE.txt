@@ -3,11 +3,12 @@ RELEASE NOTES
 
 Version 0.6.1 (--/--/--)
 ----------------------
-- Fixed bug 27 Fits with -r overwrites output files with same filename but different path
+- Fixed issue 27: Fits with -r overwrites output files with same filename but different path
   http://code.google.com/p/fits/issues/detail?id=27
 - Added new output option -xc.  This will output converted standard output format (MIX, TextMD, DocumentMD, AES57) 
   within the FITS XML <fits>/<metadata>/<xxxx>/<standard> element, where <xxxx> is either <image>, <text>, <document>, <audio>, or <video>. 
 - Added eml to the Jhove exclude-ext list
+- Improved FitsOutput API
 
 Version 0.6.0 (10/25/11)
 ----------------------

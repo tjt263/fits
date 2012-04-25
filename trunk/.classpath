@@ -24,7 +24,6 @@
 	<classpathentry kind="lib" path="lib/jhove/jhove.jar" sourcepath="/jhove"/>
 	<classpathentry kind="lib" path="lib/jhove/JhoveApp.jar"/>
 	<classpathentry kind="lib" path="lib/jhove/jhove-module.jar"/>
-	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/saxpath.jar"/>
 	<classpathentry kind="lib" path="lib/fast-md5.jar"/>
 	<classpathentry kind="lib" path="lib/commons-cli-1.1.jar"/>
@@ -63,6 +62,7 @@
 	<classpathentry kind="lib" path="lib/ots.jar"/>
 	<classpathentry kind="lib" path="lib/stax2-api-3.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/AES31.jar"/>
+	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="build_local"/>
 </classpath>

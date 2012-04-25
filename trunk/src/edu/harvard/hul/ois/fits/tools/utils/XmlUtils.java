@@ -31,7 +31,7 @@ import org.jdom.xpath.XPath;
 
 import edu.harvard.hul.ois.fits.Fits;
 import edu.harvard.hul.ois.fits.identity.ExternalIdentifier;
-import edu.harvard.hul.ois.fits.identity.FileIdentity;
+import edu.harvard.hul.ois.fits.identity.ToolIdentity;
 import edu.harvard.hul.ois.fits.tools.ToolInfo;
 
 public class XmlUtils {
@@ -130,45 +130,6 @@ public class XmlUtils {
 		return foundE;
 	}
 	
-	public static List<FileIdentity> getFileIdentities(Document dom, ToolInfo info) {
-		List<FileIdentity> identities = new ArrayList<FileIdentity>();
-		try {
-			XPath xpath = XPath.newInstance("//fits:identity");
-			Namespace ns = Namespace.getNamespace("fits",Fits.fitsXmlNamespace);
-			xpath.addNamespace(ns);
-			List<Element> identElements = xpath.selectNodes(dom);
-			for(Element element : identElements) {
-				Attribute formatAttr = element.getAttribute("format");
-				Attribute mimetypeAttr = element.getAttribute("mimetype");
-				Element versionElement = element.getChild("version",ns);
-				
-				String format = null;
-				String mimetype = null;
-				String version = null;
-				
-				if(formatAttr != null) {
-					format = formatAttr.getValue();
-				}
-				if(mimetypeAttr != null) {
-					mimetype = mimetypeAttr.getValue();
-				}
-				if(versionElement != null) {
-					version = versionElement.getText();
-				}
-				FileIdentity identity = new FileIdentity(mimetype,format,version,info);
-				List<Element> xIDElements = element.getChildren("externalIdentifier",ns);
-				for(Element xIDElement : xIDElements) {
-					String type = xIDElement.getAttributeValue("type");
-					String value = xIDElement.getText();
-					ExternalIdentifier xid = new ExternalIdentifier(type,value,info);
-					identity.addExternalIdentifier(xid);
-				}
-				identities.add(identity);
-			}
-		} catch (JDOMException e) {
-			e.printStackTrace();
-		}
-		return identities;
-	}
+	
 
 }

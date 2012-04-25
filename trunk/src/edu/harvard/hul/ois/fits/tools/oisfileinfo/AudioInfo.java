@@ -44,7 +44,7 @@ import edu.harvard.hul.ois.fits.tools.ToolOutput;
 public class AudioInfo extends ToolBase {
 	
 	private boolean enabled = true;
-	private Namespace fitsNS = Namespace.getNamespace(Fits.fitsXmlNamespace);
+	private Namespace fitsNS = Namespace.getNamespace(Fits.XML_NAMESPACE);
 	private Namespace xsiNS = Namespace.getNamespace("xsi","http://www.w3.org/2001/XMLSchema-instance");
 	
 	public AudioInfo() throws FitsToolException {

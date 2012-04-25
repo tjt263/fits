@@ -18,39 +18,57 @@
  */
 package edu.harvard.hul.ois.fits;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 
-import edu.harvard.hul.ois.fits.consolidation.FitsIdentitySection;
+import edu.harvard.hul.ois.fits.exceptions.FitsException;
+import edu.harvard.hul.ois.fits.identity.ExternalIdentifier;
+import edu.harvard.hul.ois.fits.identity.FitsIdentity;
+import edu.harvard.hul.ois.fits.identity.FormatVersion;
+import edu.harvard.hul.ois.fits.tools.ToolInfo;
 import edu.harvard.hul.ois.ots.schemas.AES.AudioObject;
 import edu.harvard.hul.ois.ots.schemas.DocumentMD.DocumentMD;
 import edu.harvard.hul.ois.ots.schemas.MIX.Mix;
 import edu.harvard.hul.ois.ots.schemas.TextMD.TextMD;
 import edu.harvard.hul.ois.ots.schemas.XmlContent.XmlContent;
 
+
+/**
+ * This class acts as a wrapper aroudn the fitsXML JDOM Document and provides
+ * convenience methods for converting the FITS XML format to standard technical 
+ * metdata schemas, accessing identification, file info, and metadata elements
+ * @author spencer
+ *
+ */
 public class FitsOutput {
 	
 	private Document fitsXml;          // This is in the FITS XML format
-	private List<FitsIdentitySection> identities;
 	private List<Exception> caughtExceptions = new ArrayList<Exception>();
-	private Namespace ns = Namespace.getNamespace(Fits.fitsXmlNamespace);
+	private Namespace ns = Namespace.getNamespace(Fits.XML_NAMESPACE);
+	private XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 	
-	public FitsOutput(Document fitsXml,List<FitsIdentitySection> identities) {
+	public FitsOutput(Document fitsXml) {
 		this.fitsXml = fitsXml;
-		this.identities = identities;
 	}
 		
 	public void setFitsXml(Document fitsXml) {
@@ -61,14 +79,6 @@ public class FitsOutput {
 		return fitsXml;
 	}
 	
-	public List<FitsIdentitySection> getIdentities() {
-		return identities;
-	}
-
-	public void setIdentities(List<FitsIdentitySection> identities) {
-		this.identities = identities;
-	}
-	
 	public List<Exception> getCaughtExceptions() {
 		return caughtExceptions;
 	}
@@ -77,18 +87,21 @@ public class FitsOutput {
 		this.caughtExceptions = caughtExceptions;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<FitsMetadataElement> getFileInfoElements() {
 		Element root = fitsXml.getRootElement();
 		Element fileInfo = root.getChild("fileinfo",ns);
 		return buildMetadataList(fileInfo);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<FitsMetadataElement> getFileStatusElements() {
 		Element root = fitsXml.getRootElement();
 		Element fileStatus = root.getChild("filestatus",ns);
 		return buildMetadataList(fileStatus);
 	}
 		
+	@SuppressWarnings("unchecked")
 	public List<FitsMetadataElement> getTechMetadataElements() {
 		Element root = fitsXml.getRootElement();
 		Element metadata = (Element)root.getChild("metadata",ns);
@@ -116,7 +129,7 @@ public class FitsOutput {
 	public FitsMetadataElement getMetadataElement(String name) {
 		try {			
 			XPath xpath = XPath.newInstance("//fits:"+name);
-			xpath.addNamespace("fits",Fits.fitsXmlNamespace);
+			xpath.addNamespace("fits",Fits.XML_NAMESPACE);
 			Element node = (Element)xpath.selectSingleNode(fitsXml);
 			if(node != null) {
 				FitsMetadataElement element = buildMetdataIElements(node);
@@ -128,11 +141,12 @@ public class FitsOutput {
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<FitsMetadataElement> getMetadataElements(String name) {
 		List<FitsMetadataElement> elements = new ArrayList<FitsMetadataElement>();
 		try {
 			XPath xpath = XPath.newInstance("//fits:"+name);
-			xpath.addNamespace("fits",Fits.fitsXmlNamespace);
+			xpath.addNamespace("fits",Fits.XML_NAMESPACE);
 			List<Element> nodes = xpath.selectNodes(fitsXml);
 			for(Element e : nodes) {
 				elements.add(buildMetdataIElements(e));
@@ -170,6 +184,7 @@ public class FitsOutput {
 		}
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private List buildMetadataList(Element parent) {
 		List<FitsMetadataElement> data = new ArrayList<FitsMetadataElement>();
 		if(parent == null) {
@@ -276,4 +291,116 @@ public class FitsOutput {
         }
         return null;
     }
+    
+    public void addStandardCombinedFormat() throws XMLStreamException, IOException, FitsException {
+		//get the normal fits xml output
+		Namespace ns = Namespace.getNamespace(Fits.XML_NAMESPACE);
+		
+		Element metadata = (Element) fitsXml.getRootElement().getChild("metadata",ns); 
+		Element techmd = null;
+		if(metadata.getChildren().size() > 0) {
+			techmd = (Element) metadata.getChildren().get(0);
+		}
+
+		//if we have technical metadata convert it to the standard form
+		if(techmd != null && techmd.getChildren().size() > 0) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			XmlContent xml = getStandardXmlContent();
+			XMLStreamWriter sw = xmlOutputFactory.createXMLStreamWriter(baos);
+			xml.output(sw);
+			String stdxml = baos.toString("UTF-8");
+			
+			//convert the std xml back to a JDOM element so we can insert it back into the fitsXml Document
+			try {
+				StringReader sReader = new StringReader(stdxml);
+				SAXBuilder saxBuilder = new SAXBuilder();
+				Document stdXmlDoc = saxBuilder.build(sReader);
+				Element stdElement = new Element("standard",ns);
+				stdElement.addContent(stdXmlDoc.getRootElement().detach());
+				techmd.addContent(stdElement);
+				
+			}
+			catch(JDOMException e) {
+				throw new FitsException("error converting standard XML", e);
+			}
+		}
+    }
+    
+	@SuppressWarnings("unchecked")
+	public List<FitsIdentity> getIdentities() {
+		List<FitsIdentity> identities = new ArrayList<FitsIdentity>();
+		try {
+			XPath xpath = XPath.newInstance("//fits:identity");
+			Namespace ns = Namespace.getNamespace("fits",Fits.XML_NAMESPACE);
+			xpath.addNamespace(ns);
+			List<Element> identElements = xpath.selectNodes(fitsXml);
+			for(Element element : identElements) {
+				FitsIdentity fileIdentSect = new FitsIdentity();
+				
+				//get the identity attributes
+				Attribute formatAttr = element.getAttribute("format");
+				Attribute mimetypeAttr = element.getAttribute("mimetype");
+				if(formatAttr != null) {
+					fileIdentSect.setFormat(formatAttr.getValue());
+				}
+				if(mimetypeAttr != null) {
+					fileIdentSect.setMimetype(mimetypeAttr.getValue());
+				}
+				
+				//get the tool elements
+				List<Element> toolElements = element.getChildren("tool",ns);
+				for(Element toolElement : toolElements) {
+					ToolInfo toolInfo = new ToolInfo();
+					Attribute toolNameAttr = toolElement.getAttribute("toolname");
+					Attribute toolVersionAttr = toolElement.getAttribute("toolversion");
+					if(toolNameAttr != null) {
+						toolInfo.setName(toolNameAttr.getValue());
+					}
+					if(toolVersionAttr != null) {
+						toolInfo.setVersion(toolVersionAttr.getValue());
+					}
+					fileIdentSect.addReportingTool(toolInfo);
+				}
+				
+				//get the version elements
+				List<Element> versionElements = element.getChildren("version",ns);
+				for(Element versionElement : versionElements) {
+					ToolInfo toolInfo = new ToolInfo();
+					Attribute toolNameAttr = versionElement.getAttribute("toolname");
+					Attribute toolVersionAttr = versionElement.getAttribute("toolversion");
+					if(toolNameAttr != null) {
+						toolInfo.setName(toolNameAttr.getValue());
+					}
+					if(toolVersionAttr != null) {
+						toolInfo.setVersion(toolVersionAttr.getValue());
+					}
+					String value = versionElement.getText();
+					FormatVersion formatVersion = new FormatVersion(value,toolInfo);
+					fileIdentSect.addFormatVersion(formatVersion);
+				}
+				
+				//get the externalIdentifier elements
+				List<Element> xIDElements = element.getChildren("externalIdentifier",ns);
+				for(Element xIDElement : xIDElements) {
+					String type = xIDElement.getAttributeValue("type");
+					String value = xIDElement.getText();
+					ToolInfo toolInfo = new ToolInfo();
+					Attribute toolNameAttr = xIDElement.getAttribute("toolname");
+					Attribute toolVersionAttr = xIDElement.getAttribute("toolversion");
+					if(toolNameAttr != null) {
+						toolInfo.setName(toolNameAttr.getValue());
+					}
+					if(toolVersionAttr != null) {
+						toolInfo.setVersion(toolVersionAttr.getValue());
+					}
+					ExternalIdentifier xid = new ExternalIdentifier(type,value,toolInfo);
+					fileIdentSect.addExternalID(xid);
+				}
+				identities.add(fileIdentSect);
+			}
+		} catch (JDOMException e) {
+			e.printStackTrace();
+		}
+		return identities;
+	}
 }

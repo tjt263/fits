@@ -28,7 +28,11 @@
 
 package edu.harvard.hul.ois.fits.junit;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
+
+import junit.framework.TestCase;
 
 import edu.harvard.hul.ois.fits.XmlContentConverter;
 import edu.harvard.hul.ois.ots.schemas.DocumentMD.DocumentMD;
@@ -56,12 +60,14 @@ import edu.harvard.hul.ois.ots.schemas.TextMD.TextMD;
 //import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.junit.Test;
 //import org.jdom.JDOMException;
 
 import org.custommonkey.xmlunit.*;
 
-public class XmlContentConverterTest extends XMLTestCase {
+public class XmlContentConverterTest {
 
+	@Test
     public void testToMix () {
         // Construct a document using JDOM
         Document jdoc = new Document ();
@@ -131,6 +137,7 @@ public class XmlContentConverterTest extends XMLTestCase {
         assertTrue (lumaBlue == 30.0);    
     }
 
+	@Test
     public void testToDocumentMD () {
         // Construct a document using JDOM
         Document jdoc = new Document ();
@@ -173,8 +180,9 @@ public class XmlContentConverterTest extends XMLTestCase {
         assertTrue (feature == Feature.hasForms);
 
         assertTrue (dmd.getPageCount() == 6);
-}
+	}
         
+	@Test
     public void testToTextMD () {
         final String mln = "http://www.loc.gov/standards/mets/mets.xsd";
         // Construct a document using JDOM

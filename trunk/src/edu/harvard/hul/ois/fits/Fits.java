@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,8 +38,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import net.sf.saxon.event.Builder;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -51,12 +48,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.jdom.Content;
 import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -80,11 +72,12 @@ public class Fits {
 	public static boolean validateToolOutput;
 	public static String externalOutputSchema;
 	public static String internalOutputSchema;
-	public static String fitsXmlNamespace;
+	public static final String XML_NAMESPACE = "http://hul.harvard.edu/ois/xml/ns/fits/fits_output";
 	
 	public static String VERSION = "0.6.1";
 	
 	private ToolOutputConsolidator consolidator;
+	private static XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 	private ToolBelt toolbelt;
 	
 	private static boolean traverseDirs;
@@ -128,7 +121,6 @@ public class Fits {
 		validateToolOutput = config.getBoolean("output.validate-tool-output");
 		externalOutputSchema   = config.getString("output.external-output-schema");
 		internalOutputSchema   = config.getString("output.internal-output-schema");
-		fitsXmlNamespace   = config.getString("output.fits-xml-namespace");
 		
 		String consolidatorClass = config.getString("output.dataConsolidator[@class]");
 		try {
@@ -170,7 +162,6 @@ public class Fits {
 			System.out.println(Fits.VERSION);
 			System.exit(0);
 		}
-		
 		if(cmd.hasOption("r")) {
 			traverseDirs = true;
 		}
@@ -221,8 +212,6 @@ public class Fits {
 			else if(f.isFile()) {
 				FitsOutput result = doSingleFile(f);
 				String outputFile = outputDir.getPath() + File.separator + f.getName() + ".fits.xml";
-				
-				//TODO need to test this
 				File output = new File(outputFile);
 				if(output.exists()) {
 					int cnt = 1;
@@ -235,8 +224,6 @@ public class Fits {
 						cnt++;
 					}
 				}
-				
-				
 				outputResults(result,outputFile,useStandardSchemas,standardCombinedFormat,true);
 			}
 		}
@@ -284,39 +271,7 @@ public class Fits {
 			}
 			//if we are using -xc output FITS xml and standard format
 			else if(standardCombinedFormat) {
-				//get the normal fits xml output
-				Document doc = result.getFitsXml();
-				Namespace ns = Namespace.getNamespace(Fits.fitsXmlNamespace);
-				
-				Element metadata = (Element) doc.getRootElement().getChild("metadata",ns); 
-				Element techmd = null;
-				if(metadata.getChildren().size() > 0) {
-					techmd = (Element) metadata.getChildren().get(0);
-				}
-
-				//if we have technical metadata convert it to the standard form
-				if(techmd != null && techmd.getChildren().size() > 0) {
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					outputStandardSchemaXml(result,baos);
-					String stdxml = baos.toString("UTF-8");
-					
-					try {
-						StringReader sReader = new StringReader(stdxml);
-						SAXBuilder saxBuilder = new SAXBuilder();
-						Document stdXmlDoc = saxBuilder.build(sReader);
-						Element stdElement = new Element("standard",ns);
-						stdElement.addContent(stdXmlDoc.getRootElement().detach());
-						techmd.addContent(stdElement);
-						
-					}
-					catch(JDOMException e) {
-						throw new FitsException("error converting standard XML", e);
-					}
-				}
-				
-				//output the merged JDOM object
-				XMLOutputter serializer = new XMLOutputter(Format.getPrettyFormat());
-				serializer.output(doc, out);
+				outputStandardCombinedFormat(result,out);
 			}
 			//else output FITS XML to -o
 			else {
@@ -333,15 +288,20 @@ public class Fits {
 		}
 	}
 	
-	public static void outputCombinedFormat() {
+	public static void outputStandardCombinedFormat(FitsOutput result, OutputStream out) throws XMLStreamException, IOException, FitsException {
+		//add the normal fits xml output
+		result.addStandardCombinedFormat();
 		
+		//output the merged JDOM Document
+		XMLOutputter serializer = new XMLOutputter(Format.getPrettyFormat());
+		serializer.output(result.getFitsXml(), out);
+
 	}
 	
 	public static void outputStandardSchemaXml(FitsOutput fitsOutput, OutputStream out) throws XMLStreamException, IOException {
 		XmlContent xml = fitsOutput.getStandardXmlContent();
 		
 		//create an xml output factory
-	    XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 	    Transformer transformer = null;
 	    
 	    //initialize transformer for pretty print xslt

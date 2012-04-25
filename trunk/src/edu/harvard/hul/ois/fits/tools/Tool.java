@@ -20,7 +20,7 @@ package edu.harvard.hul.ois.fits.tools;
 
 import java.io.File;
 import edu.harvard.hul.ois.fits.exceptions.FitsToolException;
-import edu.harvard.hul.ois.fits.identity.FileIdentity;
+import edu.harvard.hul.ois.fits.identity.ToolIdentity;
 
 
 public interface Tool extends Runnable {
@@ -41,7 +41,7 @@ public interface Tool extends Runnable {
 	 * @param identity the identity to test
 	 * @return boolean indicating the file is a known or unknown type for the tool
 	 */
-	public boolean isIdentityKnown(FileIdentity identity);
+	public boolean isIdentityKnown(ToolIdentity identity);
 		
 	/**
 	 * Returns the information about the tool

@@ -35,7 +35,7 @@ import java.text.ParseException;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
-import edu.harvard.hul.ois.fits.consolidation.FitsIdentitySection;
+import edu.harvard.hul.ois.fits.identity.FitsIdentity;
 import edu.harvard.hul.ois.ots.schemas.XmlContent.Rational;
 import edu.harvard.hul.ois.ots.schemas.XmlContent.XmlContent;
 import edu.harvard.hul.ois.ots.schemas.XmlContent.XmlContentException;
@@ -49,7 +49,7 @@ import edu.harvard.hul.ois.ots.schemas.MIX.YCbCrSubSampling;
  *  for this to compile. */
 public class XmlContentConverter {
 	
-	private Namespace ns = Namespace.getNamespace(Fits.fitsXmlNamespace);
+	private Namespace ns = Namespace.getNamespace(Fits.XML_NAMESPACE);
     
     /** Converts an image element to a MIX object
      * 
@@ -674,7 +674,7 @@ public class XmlContentConverter {
         	String filename = fitsOutput.getMetadataElement("filename").getValue();
         	
         	
-        	FitsIdentitySection fitsIdent = fitsOutput.getIdentities().get(0);
+        	FitsIdentity fitsIdent = fitsOutput.getIdentities().get(0);
         	String version = null;
         	if(fitsIdent.getFormatVersions().size() > 0) {
         		version = fitsIdent.getFormatVersions().get(0).getValue();

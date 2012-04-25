@@ -49,7 +49,7 @@ public class audioStdSchemaTest extends XMLTestCase {
 		XMLOutputter serializer = new XMLOutputter(Format.getPrettyFormat());
 		serializer.output(fitsOut.getFitsXml(), System.out);
 		
-		XmlContent xml = (DocumentMD)fitsOut.getStandardXmlContent();
+		XmlContent xml = fitsOut.getStandardXmlContent();
 		
 		if(xml != null) {
 			xml.setRoot(true);

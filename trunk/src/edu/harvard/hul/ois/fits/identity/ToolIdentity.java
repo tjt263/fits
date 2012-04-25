@@ -23,7 +23,7 @@ import java.util.List;
 
 import edu.harvard.hul.ois.fits.tools.ToolInfo;
 
-public class FileIdentity {
+public class ToolIdentity {
 	
 	//Some tools may report multiple mimetypes, formats or format versions
 	private String mime = new String();
@@ -32,14 +32,14 @@ public class FileIdentity {
 	private List<ExternalIdentifier> externalIds = new ArrayList<ExternalIdentifier>();
 	private ToolInfo toolInfo;
 	
-	public FileIdentity(String mime, String format, ToolInfo toolInfo) {
+	public ToolIdentity(String mime, String format, ToolInfo toolInfo) {
 		this.mime = mime;
 		this. format = format;
 		formatVersion = null;
 		this.toolInfo = toolInfo;
 	}
 	
-	public FileIdentity(String mime, String format, String formatVersion, ToolInfo toolInfo) {
+	public ToolIdentity(String mime, String format, String formatVersion, ToolInfo toolInfo) {
 		this.mime = mime;
 		this. format = format;
 		this. formatVersion = new FormatVersion(formatVersion,toolInfo);
