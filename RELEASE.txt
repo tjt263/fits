@@ -1,7 +1,7 @@
 RELEASE NOTES
 -------------
 
-Version 0.6.1 (--/--/--)
+Version 0.6.1 (04/25/12)
 ----------------------
 - Fixed issue 27: Fits with -r overwrites output files with same filename but different path
   http://code.google.com/p/fits/issues/detail?id=27
