@@ -76,7 +76,7 @@ public class FitsOutputXmlTest extends XMLTestCase {
 				continue;
 			}
 			Document expectedXml = builder.build(new FileInputStream(outputFile));
-			FitsOutput expectedFits = new FitsOutput(expectedXml,null);
+			FitsOutput expectedFits = new FitsOutput(expectedXml);
 			
 			FitsOutput[][] tmp = new FitsOutput[][]{{expectedFits,fitsOut}};
 			inputs.add(tmp[0]);

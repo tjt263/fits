@@ -25,13 +25,19 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.jdom.Attribute;
 import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
+import org.jdom.xpath.XPath;
 import org.xml.sax.InputSource;
 
 import edu.harvard.hul.ois.fits.Fits;
 import edu.harvard.hul.ois.fits.exceptions.FitsToolException;
-import edu.harvard.hul.ois.fits.identity.FileIdentity;
+import edu.harvard.hul.ois.fits.identity.ExternalIdentifier;
+import edu.harvard.hul.ois.fits.identity.ToolIdentity;
 import edu.harvard.hul.ois.fits.tools.utils.XmlUtils;
 
 public class ToolOutput {	
@@ -42,7 +48,7 @@ public class ToolOutput {
 	//Reference to the tool the output was created with
 	private Tool tool;
 	//Identification data about the image
-	private List<FileIdentity> identity = new ArrayList<FileIdentity>();
+	private List<ToolIdentity> identity = new ArrayList<ToolIdentity>();
 	
 	public ToolOutput(Tool tool, Document fitsXml, Document toolOutput) throws FitsToolException {
 		if(Fits.validateToolOutput && fitsXml !=null && !validateXmlOutput(fitsXml)) {
@@ -56,7 +62,7 @@ public class ToolOutput {
 		if(fitsXml != null) {
 			//fitsxml doc is mapped here before identities are extracted
 			this.fitsXml = Fits.mapper.applyMap(tool,fitsXml);
-			identity = XmlUtils.getFileIdentities(fitsXml,tool.getToolInfo());
+			identity = createFileIdentities(fitsXml,tool.getToolInfo());
 		}		
 	}
 	
@@ -80,11 +86,11 @@ public class ToolOutput {
 		return toolOutput;
 	}
 	
-	public List<FileIdentity> getFileIdentity() {
+	public List<ToolIdentity> getFileIdentity() {
 		return identity;
 	}
 	
-	public void addFileIdentity(FileIdentity id) {
+	public void addFileIdentity(ToolIdentity id) {
 		identity.add(id);
 	}
 	
@@ -134,6 +140,47 @@ public class ToolOutput {
 			return false;
 		} 
 	    return true;*/
+	}
+	
+	public List<ToolIdentity> createFileIdentities(Document dom, ToolInfo info) {
+		List<ToolIdentity> identities = new ArrayList<ToolIdentity>();
+		try {
+			XPath xpath = XPath.newInstance("//fits:identity");
+			Namespace ns = Namespace.getNamespace("fits",Fits.XML_NAMESPACE);
+			xpath.addNamespace(ns);
+			List<Element> identElements = xpath.selectNodes(dom);
+			for(Element element : identElements) {
+				Attribute formatAttr = element.getAttribute("format");
+				Attribute mimetypeAttr = element.getAttribute("mimetype");
+				Element versionElement = element.getChild("version",ns);
+				
+				String format = null;
+				String mimetype = null;
+				String version = null;
+				
+				if(formatAttr != null) {
+					format = formatAttr.getValue();
+				}
+				if(mimetypeAttr != null) {
+					mimetype = mimetypeAttr.getValue();
+				}
+				if(versionElement != null) {
+					version = versionElement.getText();
+				}
+				ToolIdentity identity = new ToolIdentity(mimetype,format,version,info);
+				List<Element> xIDElements = element.getChildren("externalIdentifier",ns);
+				for(Element xIDElement : xIDElements) {
+					String type = xIDElement.getAttributeValue("type");
+					String value = xIDElement.getText();
+					ExternalIdentifier xid = new ExternalIdentifier(type,value,info);
+					identity.addExternalIdentifier(xid);
+				}
+				identities.add(identity);
+			}
+		} catch (JDOMException e) {
+			e.printStackTrace();
+		}
+		return identities;
 	}
 	
 }

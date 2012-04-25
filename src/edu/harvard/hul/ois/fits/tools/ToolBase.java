@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -36,7 +37,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMResult;
 import org.jdom.Document;
 import edu.harvard.hul.ois.fits.exceptions.FitsToolException;
-import edu.harvard.hul.ois.fits.identity.FileIdentity;
+import edu.harvard.hul.ois.fits.identity.ToolIdentity;
 
 public abstract class ToolBase implements Tool {
 	
@@ -52,8 +53,7 @@ public abstract class ToolBase implements Tool {
 	
 	public ToolBase() throws FitsToolException {
 		info = new ToolInfo();
-		System.setProperty("javax.xml.transform.TransformerFactory","net.sf.saxon.TransformerFactoryImpl");
-		tFactory = TransformerFactory.newInstance ();
+		tFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl",null);
 		saxBuilder = new SAXBuilder();
 		excludedExtensions = new ArrayList<String>();
 	}
@@ -70,7 +70,7 @@ public abstract class ToolBase implements Tool {
 		inputFile = file;
 	}
 	
-	public boolean isIdentityKnown(FileIdentity identity) {
+	public boolean isIdentityKnown(ToolIdentity identity) {
 		if(!canIdentify()) {
 			return false;
 		}
@@ -92,7 +92,7 @@ public abstract class ToolBase implements Tool {
 		}
 	}
 		
-	public Boolean validate(File files_or_dir, FileIdentity identity) {
+	public Boolean validate(File files_or_dir, ToolIdentity identity) {
 		return null;
 	}
 

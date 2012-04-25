@@ -52,7 +52,7 @@ public class FileInfo extends ToolBase {
 	private Document createXml(File file) throws FitsToolException {
 		
 		Namespace xsiNS = Namespace.getNamespace("xsi","http://www.w3.org/2001/XMLSchema-instance");
-		Namespace fitsNS = Namespace.getNamespace(Fits.fitsXmlNamespace);
+		Namespace fitsNS = Namespace.getNamespace(Fits.XML_NAMESPACE);
 		
 		Element root = new Element("fits",fitsNS);
 		root.setAttribute(new Attribute("schemaLocation","http://hul.harvard.edu/ois/xml/ns/fits/fits_output "+Fits.externalOutputSchema,xsiNS));
