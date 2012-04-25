@@ -92,8 +92,10 @@ public class FileUtility extends ToolBase {
 		else if(osHasTool) {
 			//use file command in operating system
 			execCommand.addAll(UNIX_COMMAND);
-			execCommand.add("-e");
-			execCommand.add("cdf");
+			if(info.getVersion().startsWith("5")) {
+				execCommand.add("-e");
+				execCommand.add("cdf");
+			}
 			execCommand.add(file.getPath());
 		}
 		else {
