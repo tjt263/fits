@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.harvard.hul.ois.fits.Fits;
+import edu.harvard.hul.ois.fits.FitsOutput;
 import edu.harvard.hul.ois.fits.consolidation.VersionComparer;
 import edu.harvard.hul.ois.fits.tools.ToolInfo;
 /**
@@ -40,14 +41,14 @@ public class FitsIdentity {
 	
 	public FitsIdentity() {
 		toolName= "FITS";
-		toolVersion = Fits.VERSION;
+		toolVersion = FitsOutput.VERSION;
 	}
 	
 	public FitsIdentity(ToolIdentity identity) {
 		this.format = identity.getFormat();
 		this.mimetype = identity.getMime();
 		toolName= "FITS";
-		toolVersion = Fits.VERSION;
+		toolVersion = FitsOutput.VERSION;
 		if(identity.getFormatVersionValue() != null) {
 			formatVersions.add(identity.getFormatVersion());
 		}

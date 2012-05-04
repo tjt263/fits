@@ -74,8 +74,6 @@ public class Fits {
 	public static String internalOutputSchema;
 	public static final String XML_NAMESPACE = "http://hul.harvard.edu/ois/xml/ns/fits/fits_output";
 	
-	public static String VERSION = "0.6.1";
-	
 	private ToolOutputConsolidator consolidator;
 	private static XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
 	private ToolBelt toolbelt;
@@ -159,7 +157,7 @@ public class Fits {
 			System.exit(0);
 		}
 		if(cmd.hasOption("v")) {
-			System.out.println(Fits.VERSION);
+			System.out.println(FitsOutput.VERSION);
 			System.exit(0);
 		}
 		if(cmd.hasOption("r")) {

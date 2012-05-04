@@ -498,7 +498,7 @@ public class OISConsolidator implements ToolOutputConsolidator {
 		fits.addNamespaceDeclaration(xsiNS);
 		fits.setAttribute(new Attribute("schemaLocation",Fits.XML_NAMESPACE+" "+Fits.externalOutputSchema, xsiNS));
 		
-		fits.setAttribute("version", Fits.VERSION);
+		fits.setAttribute("version", FitsOutput.VERSION);
 		DateFormat dateFormat = new SimpleDateFormat(); 
 		Date date = new Date();
 		fits.setAttribute("timestamp",dateFormat.format(date));

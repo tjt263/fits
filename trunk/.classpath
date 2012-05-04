@@ -30,7 +30,6 @@
 	<classpathentry kind="lib" path="lib/jaxen-core.jar"/>
 	<classpathentry kind="lib" path="lib/jaxen-jdom.jar"/>
 	<classpathentry kind="lib" path="lib/xmlunit-1.2.jar"/>
-	<classpathentry kind="lib" path="lib/fits.jar"/>
 	<classpathentry kind="lib" path="lib/staxmate-2.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/saxon9-dom.jar"/>
 	<classpathentry kind="lib" path="lib/saxon9-jdom.jar"/>
