@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,10 +63,19 @@ import edu.harvard.hul.ois.ots.schemas.XmlContent.XmlContent;
  */
 public class FitsOutput {
 	
+	public static String VERSION = "0.6.1";
+	
 	private Document fitsXml;          // This is in the FITS XML format
 	private List<Exception> caughtExceptions = new ArrayList<Exception>();
 	private Namespace ns = Namespace.getNamespace(Fits.XML_NAMESPACE);
 	private XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+	
+	public FitsOutput(String fitsXmlStr) throws JDOMException, IOException {
+		SAXBuilder builder = new SAXBuilder();
+		Reader in = new StringReader(fitsXmlStr);
+		Document fitsXml = builder.build(in);
+		this.fitsXml = fitsXml;
+	}
 	
 	public FitsOutput(Document fitsXml) {
 		this.fitsXml = fitsXml;
