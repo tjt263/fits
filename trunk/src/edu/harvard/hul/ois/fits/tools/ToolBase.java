@@ -50,12 +50,14 @@ public abstract class ToolBase implements Tool {
 
     
     private List<String> excludedExtensions;
+    private List<String> includedExtensions;
 	
 	public ToolBase() throws FitsToolException {
 		info = new ToolInfo();
 		tFactory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl",null);
 		saxBuilder = new SAXBuilder();
 		excludedExtensions = new ArrayList<String>();
+		includedExtensions = new ArrayList<String>();
 	}
 	
 	public ToolInfo getToolInfo() {
@@ -119,6 +121,28 @@ public abstract class ToolBase implements Tool {
 	
 	public boolean hasExcludedExtension(String ext) {
 		for(String extension : excludedExtensions) {
+			if(extension.equalsIgnoreCase(ext)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addIncludedExtension(String ext) {
+		includedExtensions.add(ext);
+	}
+	
+	public boolean hasIncludedExtensions() {
+		if(includedExtensions.size() > 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public boolean hasIncludedExtension(String ext) {
+		for(String extension : includedExtensions) {
 			if(extension.equalsIgnoreCase(ext)) {
 				return true;
 			}

@@ -409,7 +409,10 @@ public class Fits {
 		ArrayList<Thread> threads = new ArrayList<Thread>();
 		for(Tool t : toolbelt.getTools()) {			
 			if(t.isEnabled()) {
-				if(!t.hasExcludedExtension(ext)) {
+				//Only run the tool against this file if:
+				//  The tool uses an 'include-ext' extentions list and it contains the extension
+				//  or if the tool does not use the 'include-ext' extension list and the extension is not in the 'exclude-ext' list
+				if((t.hasIncludedExtensions() && t.hasIncludedExtension(ext)) || (!t.hasIncludedExtensions() && !t.hasExcludedExtension(ext))) {
 					//spin up new threads
 					t.setInputFile(input);
 					Thread thread = new Thread(t);
