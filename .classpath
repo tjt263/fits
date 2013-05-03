@@ -58,7 +58,7 @@
 	<classpathentry kind="lib" path="lib/nzmetool/metadata.jar"/>
 	<classpathentry kind="lib" path="lib/nzmetool/PDFBox-0.7.3.jar"/>
 	<classpathentry kind="lib" path="lib/nzmetool/poi-2.5.1-final-20040804.jar"/>
-	<classpathentry kind="lib" path="lib/ots.jar"/>
+	<classpathentry kind="lib" path="lib/ots.jar" sourcepath="/OTS"/>
 	<classpathentry kind="lib" path="lib/stax2-api-3.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/AES31.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
