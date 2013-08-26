@@ -78,7 +78,10 @@
 						</xsl:when>	
 						<xsl:when test="$format='OpenDocument HTML Document Template'">
 								<xsl:value-of select="string('application/vnd.oasis.opendocument.text-web')"/>
-						</xsl:when>														
+						</xsl:when>		
+						<xsl:when test="$format='ColorSync ICC Profile'">
+								<xsl:value-of select="string('application/x-icc')"/>
+						</xsl:when>								
 						<xsl:otherwise>
 							<xsl:value-of select="$mime"/>
 						</xsl:otherwise>
