@@ -542,7 +542,8 @@ public class XmlContentConverter {
             			date = XmlDateFormat.exifDateTimeToXml(created.getText().trim());
             		}
             		catch(ParseException e) {
-            			e.printStackTrace();
+            			System.out.println ("Warning: " + e.getMessage ());
+            			//e.printStackTrace();
             		}
             		mm.icm.getGeneralCaptureInformation().setDateTimeCreated(date);
             	}
