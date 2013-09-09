@@ -81,6 +81,9 @@
 						</xsl:when>		
 						<xsl:when test="$format='ColorSync ICC Profile'">
 								<xsl:value-of select="string('application/x-icc')"/>
+						</xsl:when>			
+						<xsl:when test="$format='Kodak Color Management System, ICC Profile'">
+								<xsl:value-of select="string('application/x-icc')"/>
 						</xsl:when>								
 						<xsl:otherwise>
 							<xsl:value-of select="$mime"/>
