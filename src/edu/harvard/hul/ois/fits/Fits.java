@@ -336,7 +336,7 @@ public class Fits {
 				out.flush();
 				
 			} catch (Exception e) {
-				System.err.println("error converting output to a standard schema format");
+				System.err.println("error converting output to a standard schema format: " + e.getMessage());
 			}
 			finally {
 				xmlOutStream.close();
